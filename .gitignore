@@ -1,0 +1,20 @@
+# Environment & secrets
+.env
+settings.json
+config.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+mcp_client.db

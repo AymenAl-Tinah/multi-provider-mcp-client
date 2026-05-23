@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Client — Multi-Provider AI Chat</title>
+    <meta name="description"
+        content="A professional MCP client supporting Anthropic, OpenAI, Gemini, OpenRouter, DeepSeek, and Qwen">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="app" id="app">
+        <!-- ─── Sidebar ───────────────────────────────────────────── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">⚡</span>
+                    <span class="logo-text">MCP Client</span>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" id="configEditorBtn" title="Edit config.json">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z" />
+                            <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
+                            <path d="M12 2v2" />
+                            <path d="M12 20v2" />
+                            <path d="M20 12h2" />
+                            <path d="M2 12h2" />
+                            <path d="M17.66 6.34l-1.42 1.42" />
+                            <path d="M7.76 16.24l-1.42 1.42" />
+                            <path d="M17.66 17.66l-1.42-1.42" />
+                            <path d="M7.76 7.76l-1.42-1.42" />
+                        </svg>
+                    </button>
+                    <button class="icon-btn settings-btn" id="settingsBtn" title="AI Model Settings">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M12 2v2M4.93 4.93l1.41 1.41M2 12h2M4.93 19.07l1.41-1.41M12 20v2M17.66 17.66l1.41 1.41M22 12h-2M17.66 6.34l1.41-1.41" />
+                            <path d="M12 7l1.5 3.5 3.5 1.5-3.5 1.5L12 17l-1.5-3.5-3.5-1.5 3.5-1.5L12 7z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Provider Selection -->
+            <div class="sidebar-section">
+                <h3 class="section-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                        <path d="M2 17l10 5 10-5" />
+                        <path d="M2 12l10 5 10-5" />
+                    </svg>
+                    Provider
+                </h3>
+                <div class="provider-grid" id="providerGrid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+
+            <!-- Configured MCP Servers (from config.json) -->
+            <div class="sidebar-section">
+                <h3 class="section-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="2" width="20" height="8" rx="2" />
+                        <rect x="2" y="14" width="20" height="8" rx="2" />
+                        <circle cx="6" cy="6" r="1" />
+                        <circle cx="6" cy="18" r="1" />
+                    </svg>
+                    MCP Servers
+                </h3>
+                <div class="configured-servers" id="configuredServers">
+                    <div class="tools-empty">No servers in config.json</div>
+                </div>
+            </div>
+
+            <!-- Manual Server Connection -->
+            <div class="sidebar-section">
+                <h3 class="section-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Connect Manually
+                </h3>
+                <div class="server-connect">
+                    <input type="text" class="input" id="serverPathInput" placeholder="path/to/server.py">
+                    <div class="server-actions">
+                        <button class="btn btn-primary" id="connectBtn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7" />
+                            </svg>
+                            Connect
+                        </button>
+                        <button class="btn btn-ghost" id="disconnectBtn" disabled>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="connection-status" id="connectionStatus">
+                    <span class="status-dot offline"></span>
+                    <span>Disconnected</span>
+                </div>
+            </div>
+
+            <!-- Tools -->
+            <div class="sidebar-section tools-section">
+                <h3 class="section-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                    </svg>
+                    Tools
+                    <span class="tool-count" id="toolCount">0</span>
+                </h3>
+                <div class="tools-list" id="toolsList">
+                    <div class="tools-empty">No tools connected</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ─── Main Chat Area ────────────────────────────────────── -->
+        <main class="chat-area">
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <button class="icon-btn sidebar-toggle-btn" id="toggleSidebarBtn" title="Toggle Sidebar">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12" />
+                            <line x1="3" y1="6" x2="21" y2="6" />
+                            <line x1="3" y1="18" x2="21" y2="18" />
+                        </svg>
+                    </button>
+                    <button class="icon-btn mobile-menu-btn" id="mobileMenuBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12" />
+                            <line x1="3" y1="6" x2="21" y2="6" />
+                            <line x1="3" y1="18" x2="21" y2="18" />
+                        </svg>
+                    </button>
+                    <div class="chat-header-info">
+                        <h2 id="chatTitle">MCP Client</h2>
+                        <span class="chat-subtitle" id="chatSubtitle">Select a provider to get started</span>
+                    </div>
+                </div>
+                <button class="icon-btn" id="clearChatBtn" title="Clear chat">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="messages" id="messagesContainer">
+                <!-- Welcome Screen -->
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-icon">⚡</div>
+                    <h1>Welcome to MCP Client</h1>
+                    <p>Connect to any MCP server and chat with AI using your preferred provider.</p>
+                    <div class="welcome-steps">
+                        <div class="welcome-step">
+                            <span class="step-num">1</span>
+                            <span>Configure your API key in <strong>Settings</strong></span>
+                        </div>
+                        <div class="welcome-step">
+                            <span class="step-num">2</span>
+                            <span>Select a <strong>Provider</strong> and <strong>Model</strong></span>
+                        </div>
+                        <div class="welcome-step">
+                            <span class="step-num">3</span>
+                            <span>Connect to an <strong>MCP Server</strong></span>
+                        </div>
+                        <div class="welcome-step">
+                            <span class="step-num">4</span>
+                            <span>Start chatting!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-area" id="inputArea">
+                <div class="input-container">
+                    <textarea class="chat-input" id="chatInput" placeholder="Type your message..." rows="1"
+                        disabled></textarea>
+                    <button class="send-btn" id="sendBtn" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13" />
+                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- ─── Settings Panel ────────────────────────────────────── -->
+        <div class="settings-overlay" id="settingsOverlay"></div>
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-header">
+                <h2>Settings</h2>
+                <button class="icon-btn" id="closeSettingsBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="settings-body" id="settingsBody">
+                <!-- Populated by JS -->
+            </div>
+            <div class="settings-footer">
+                <button class="btn btn-ghost" id="logoutBtn" style="color: #ff6b6b;" title="Log out">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    Log Out
+                </button>
+                <button class="btn btn-primary btn-lg" id="saveSettingsBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                        <polyline points="17 21 17 13 7 13 7 21" />
+                        <polyline points="7 3 7 8 15 8" />
+                    </svg>
+                    Save Settings
+                </button>
+            </div>
+        </div>
+
+        <!-- ─── Config Editor Panel ───────────────────────────────── -->
+        <div class="config-overlay" id="configOverlay"></div>
+        <div class="config-editor-panel" id="configEditorPanel">
+            <div class="config-editor-header">
+                <div class="config-editor-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="16 18 22 12 16 6" />
+                        <polyline points="8 6 2 12 8 18" />
+                    </svg>
+                    <h2>config.json</h2>
+                    <span class="config-path" id="configFilePath"></span>
+                </div>
+                <div class="config-editor-actions">
+                    <button class="btn btn-ghost" id="reloadConfigBtn" title="Reload from disk">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="23 4 23 10 17 10" />
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                        </svg>
+                        Reload
+                    </button>
+                    <button class="btn btn-primary" id="saveConfigJsonBtn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                            <polyline points="17 21 17 13 7 13 7 21" />
+                            <polyline points="7 3 7 8 15 8" />
+                        </svg>
+                        Save
+                    </button>
+                    <button class="icon-btn" id="closeConfigBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="config-editor-hint">
+                Edit your config like Claude Desktop or VS Code MCP config. Add servers under <code>"mcpServers"</code>.
+            </div>
+            <div class="config-editor-body">
+                <div class="line-numbers" id="lineNumbers"></div>
+                <textarea class="config-textarea" id="configTextarea" spellcheck="false"></textarea>
+            </div>
+            <div class="config-editor-status" id="configEditorStatus"></div>
+        </div>
+    </div>
+
+    <!-- ─── Auth Overlay ───────────────────────────────────────────── -->
+    <div class="auth-overlay active" id="authOverlay">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">
+                    <span class="logo-icon">✨</span>
+                    <span class="logo-text">MCP Client</span>
+                </div>
+                <h2 id="authTitle">Welcome Back</h2>
+                <p id="authSubtitle">Log in to your private workspace</p>
+            </div>
+            <div class="auth-body">
+                <div class="settings-field">
+                    <label class="settings-label">Username</label>
+                    <input type="text" class="settings-input" id="authUsername" placeholder="Enter username..."
+                        autocomplete="off">
+                </div>
+                <div class="settings-field">
+                    <label class="settings-label">Password</label>
+                    <input type="password" class="settings-input" id="authPassword" placeholder="Enter password...">
+                </div>
+                <div class="auth-error" id="authError"></div>
+                <button class="btn btn-primary btn-lg" id="authSubmitBtn"
+                    style="width: 100%; justify-content: center; margin-top: 8px;">Log In</button>
+            </div>
+            <div class="auth-footer">
+                <span id="authToggleText">Don't have an account?</span>
+                <button class="btn btn-ghost" id="authToggleBtn">Sign Up</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Toast Notifications ───────────────────────────────── -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+
+</html>

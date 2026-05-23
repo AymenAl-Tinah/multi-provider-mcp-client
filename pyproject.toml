@@ -1,0 +1,14 @@
+[project]
+name = "third-project"
+version = "0.1.0"
+description = "Multi-provider MCP Client with Web Frontend"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "anthropic>=0.83.0",
+    "fastapi>=0.132.0",
+    "mcp>=1.26.0",
+    "openai>=2.22.0",
+    "python-dotenv>=1.2.1",
+    "uvicorn[standard]>=0.41.0",
+]

@@ -1,0 +1,1 @@
+0 - A\n1 - B\n2 - C\n3 - D\n4 - E\n5 - F\n6 - G\n7 - H\n8 - I\n9 - J\n10 - K\n11 - L\n12 - M\n13 - N\n14 - O\n15 - P\n16 - Q\n17 - R\n18 - S\n19 - T\n20 - U
