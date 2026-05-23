@@ -38,7 +38,7 @@
 
 1. **Clone the repository** (if applicable) and navigate to the project directory:
    ```bash
-   cd Third_Project
+   cd Project_directory
    ```
 
 2. **Install dependencies**:
